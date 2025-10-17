@@ -2,7 +2,7 @@ import { io, Socket } from 'socket.io-client';
 import { decrypt } from './crypto';
 import { logger } from '../utils';
 
-const C2_URL = 'http://localhost:4000';
+const C2_URL = `http://localhost:${process.env.C2_PORT || 4000}`;
 
 export const initializeConnector = (applyMutationCallback: (code: string) => void): void => {
     logger.info('Module [Connector]: Initializing real-time connection to C2...');

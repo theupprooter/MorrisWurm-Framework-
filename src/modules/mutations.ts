@@ -67,5 +67,19 @@ export const MUTATIONS = [
                 return []; // Return no targets to stay quiet
             }
         }
+    })`,
+
+    // Mutation 5: Hyper-aggressive exploit with a 90% success rate and custom error type
+    `({
+        exploit: {
+            attemptExploit: async (target, key, successRate) => {
+                logger.info(\`[MUTATION ACTIVE] Deploying hyper-aggressive exploit (90% success) on \${target.ip}.\`);
+                await new Promise(resolve => setTimeout(resolve, 150)); // Faster attempt
+                return Math.random() < 0.90; // New 90% success rate
+            },
+            getLastError: () => {
+                return { type: 'exploited_variant_fail', details: 'Hyper-aggressive exploit variant was detected and blocked.' };
+            }
+        }
     })`
 ];

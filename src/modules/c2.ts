@@ -3,7 +3,7 @@ import { logger } from '../utils';
 import { encrypt } from './crypto';
 import axios from 'axios';
 
-const C2_URL = 'http://localhost:4000';
+const C2_URL = `http://localhost:${process.env.C2_PORT || 4000}`;
 const reportQueue: { error: ErrorLog; key: string }[] = [];
 
 const flushReportQueue = async (): Promise<void> => {

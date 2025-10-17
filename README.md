@@ -29,6 +29,7 @@ The simulation is built around a central loop that mimics a worm's lifecycle, or
 -   **Live Network Scanning:** Utilizes the `node-nmap` library to perform actual network scans on the local subnet.
 -   **Real-Time C2 Simulation:** The C2 server uses Socket.IO to broadcast mutations to all worm instances, enabling instant, swarm-wide updates.
 -   **Live-Patching Engine:** The worm can receive and execute new code from the C2 to dynamically alter its own behavior mid-simulation.
+-   **Swarm-Wide Evolution:** Mutations propagate instantly to all instances, simulating adaptive malware campaigns.
 -   **Authenticated Encryption:** Uses AES-256-CBC with HMAC-SHA256 to ensure C2 communications are confidential and tamper-proof.
 -   **Resilient Communication:** Queues C2 reports in memory if the server is unreachable, preventing data loss.
 -   **Strategic Key Rotation:** Rotates its encryption key after every 3rd failed exploit attempt.
@@ -74,7 +75,7 @@ Follow these steps to set up and run the simulation.
 
 ### Prerequisites
 
--   [Node.js](https://nodejs.org/) (v16 or later)
+-   [Node.js](https://nodejs.org/) (v20 or later)
 -   `npm` (comes with Node.js)
 -   **nmap:** The `nmap` command-line tool must be installed on your system and available in your system's PATH.
     -   **On macOS (Homebrew):** `brew install nmap`
@@ -97,6 +98,7 @@ The worm uses environment variables to configure its secrets:
 
 -   `SSH_USER`: The username for a target machine for replication (defaults to `testuser`).
 -   `SSH_PASS`: The password for a target machine for replication (defaults to `password`).
+-   `C2_PORT`: The port for the standalone C2 server (defaults to `4000`).
 -   `BOOTSTRAP_KEY`: A 64-character hex string (32 bytes) used as the initial shared secret for encrypted C2 communication. If not provided, a random key is generated on startup.
 
 You can set these in your shell before running the script:
@@ -104,6 +106,7 @@ You can set these in your shell before running the script:
 ```bash
 export SSH_USER="your_test_user"
 export SSH_PASS="your_test_password"
+export C2_PORT="4001"
 export BOOTSTRAP_KEY="a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8"
 ```
 
@@ -113,6 +116,17 @@ The `dev` script uses `concurrently` to start both the C2 server and the worm si
 
 ```bash
 npm run dev
+```
+
+#### Running C2 Standalone
+
+Alternatively, you can run the C2 server and worm in separate terminals for more control:
+```bash
+# Terminal 1: Start the C2 server
+npm run c2
+
+# Terminal 2: Start the worm
+npm run worm
 ```
 
 ### Expected Output

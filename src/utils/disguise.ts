@@ -1,19 +1,17 @@
-// Fix: Changed import to only use the default export of express.
-// This allows using qualified types like `express.Request` to avoid conflicts with global DOM types.
-import express from 'express';
+// Fix: Use a standard ES module import for Express and explicitly import Request and Response types
+// to avoid conflicts with global DOM types.
+import express, { Request, Response } from 'express';
 import path from 'path';
 import { logger } from './logger';
 
 export const startDisguise = (): void => {
-    // Fix: Explicitly type `app` with the qualified `express.Express` type.
-    // This resolves overload errors on `app.use` by removing type ambiguity.
-    const app: express.Express = express();
+    const app = express();
     const port = 3000;
 
     // Endpoint to serve dynamic-looking data for the facade
-    // Fix: Explicitly type handler parameters with qualified `express.Request` and `express.Response` types.
-    // This resolves the error where properties like `.json()` were not found due to type conflicts.
-    app.get('/weather', (req: express.Request, res: express.Response) => {
+    // Fix: Explicitly typing `req` and `res` with Express's types resolves
+    // errors like "property 'json' does not exist".
+    app.get('/weather', (req: Request, res: Response) => {
         res.json({
             city: 'Metro City',
             temp: 72,
@@ -28,6 +26,8 @@ export const startDisguise = (): void => {
     });
 
     const publicPath = path.join(__dirname, '../../public');
+    // Fix: Correctly typing `app` by using the right import syntax for Express
+    // resolves overload errors on `app.use`.
     app.use('/', express.static(publicPath));
 
     app.listen(port, () => {
