@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { LogEntry } from '../types';
 
-const C2_URL = `http://localhost:${process.env.C2_PORT || 4000}`;
+const C2_URL = window.location.origin;
 
 type LogCallback = (log: LogEntry) => void;
 type ConnectionCallback = (isConnected: boolean) => void;
@@ -46,6 +46,7 @@ class SimulationService {
 
         this.socket.on('worm_event', (event: any) => {
             const log = this.formatEventToLog(event);
+
             onNewLog(log);
         });
     }

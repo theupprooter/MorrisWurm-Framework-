@@ -4,7 +4,7 @@
   "description": "A conceptual computer worm simulation.",
   "main": "dist/worm.js",
   "scripts": {
-    "c2": "ts-node src/c2-server.ts",
+    "c2": "ts-node src/c2-website.ts",
     "worm": "ts-node src/worm.ts",
     "dev": "concurrently \"npm:c2\" \"npm:worm\"",
     "build": "tsc"
@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^0.14.0",
     "axios": "^1.7.2",
     "express": "^4.19.2",
     "node-nmap": "^4.0.0",
