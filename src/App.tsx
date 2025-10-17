@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { simulationService } from './services/simulationService';
-import { LogEntry } from '../types';
+// FIX: Corrected the relative import path for types.
+import { LogEntry } from './types';
 import Terminal from './components/Terminal';
 import StatusBar from './components/StatusBar';
 

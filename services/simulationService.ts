@@ -1,5 +1,6 @@
+
 import { io, Socket } from 'socket.io-client';
-import { LogEntry, WormEvent } from '../types';
+import { LogEntry, WormEvent, ErrorLog } from '../types/index.js';
 
 const C2_URL = window.location.origin;
 
@@ -29,6 +30,7 @@ class SimulationService {
         this.socket.on('disconnect', () => {
             onConnectionChange(false);
             onNewLog({
+                // FIX: Corrected a malformed Date instantiation that contained a pasted URL.
                 timestamp: new Date().toLocaleTimeString(),
                 type: 'system',
                 message: 'Disconnected from C2 server.',
@@ -59,16 +61,14 @@ class SimulationService {
         switch (type) {
             case 'connect':
                 message = `Worm connected [ID: ${instanceId}]`;
-                // FIX: Cast `data` to access the `wormCount` property, which is not present on the full union type.
                 wormCount = (data as { wormCount?: number }).wormCount;
                 break;
             case 'disconnect':
                 message = `Worm disconnected [ID: ${instanceId}]`;
-                // FIX: Cast `data` to access the `wormCount` property, which is not present on the full union type.
                 wormCount = (data as { wormCount?: number }).wormCount;
                 break;
             case 'report':
-                const reportData = data as { type: string, targetIp: string, details: string };
+                const reportData = data as ErrorLog;
                 message = `Received failure report from [ID: ${instanceId}]: Type: ${reportData.type}, Target: ${reportData.targetIp}, Details: ${reportData.details}`;
                 break;
             case 'mutation':

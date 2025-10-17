@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { LogEntry } from '../types';
+import { LogEntry } from '../types/index.js';
 import { ConnectIcon, ReportIcon, MutationIcon, SystemIcon, ErrorIcon, DisconnectIcon } from './icons';
 
 interface TerminalProps {

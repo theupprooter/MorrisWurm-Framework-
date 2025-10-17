@@ -1,5 +1,7 @@
+
 import { io, Socket } from 'socket.io-client';
-import { LogEntry, WormEvent } from '../../types';
+// FIX: Corrected the relative import path and added ErrorLog type import.
+import { LogEntry, WormEvent, ErrorLog } from '../types';
 
 // Connect to the same host that served the page, letting the Vite proxy handle it.
 const C2_URL = '';
@@ -69,8 +71,9 @@ class SimulationService {
                 wormCount = (data as { wormCount?: number }).wormCount;
                 break;
             case 'report':
-                const reportData = data as { type: string, targetIp: string, details: string };
-                message = `Received failure report from [ID: ${instanceId}]: Type: ${reportData.type}, Target: ${reportData.targetIp}`;
+                // FIX: Used ErrorLog type for better type safety and included report details in the log message.
+                const reportData = data as ErrorLog;
+                message = `Received failure report from [ID: ${instanceId}]: Type: ${reportData.type}, Target: ${reportData.targetIp}, Details: ${reportData.details}`;
                 break;
             case 'mutation':
                  const mutationData = data as { mutation: string };

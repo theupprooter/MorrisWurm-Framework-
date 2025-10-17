@@ -2,10 +2,10 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
-import { logger } from './utils/logger';
-import { encrypt, decrypt } from './modules/crypto';
-import { generateMutation } from './modules/ai';
-import { ErrorLog } from '../types/index';
+import { logger } from './utils/logger.js';
+import { encrypt, decrypt } from './modules/crypto.js';
+import { generateMutation } from './modules/ai.js';
+import { ErrorLog } from '../types/index.js';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
@@ -22,7 +22,6 @@ const io = new Server(httpServer, {
 
 const PORT = process.env.C2_PORT || 4000;
 
-// FIX: Cast middleware to 'any' to resolve a type mismatch error. This is a workaround for a likely issue with conflicting @types/express versions or tsconfig settings.
 app.use(express.json() as any);
 
 // Type guard to check if an object is a valid ErrorLog
