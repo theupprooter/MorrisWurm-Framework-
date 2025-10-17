@@ -1,4 +1,5 @@
 {
   "name": "MorrisWurm-TS Visualizer",
-  "description": "A React-based visual simulator for a conceptual computer worm, inspired by the Morris Worm. It showcases the worm's lifecycle including reconnaissance, exploitation, and command & control in a safe, simulated terminal environment."
+  "description": "A React-based visual simulator for a conceptual computer worm, inspired by the Morris Worm. It showcases the worm's lifecycle including reconnaissance, exploitation, and command & control in a safe, simulated terminal environment.",
+  "requestFramePermissions": []
 }

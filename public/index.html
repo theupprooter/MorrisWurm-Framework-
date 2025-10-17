@@ -12,18 +12,53 @@
         ul { list-style: none; padding: 0; }
         li { padding: 0.75rem 0; border-bottom: 1px solid #eee; }
         li:last-child { border-bottom: none; }
+        .loading { text-align: center; color: #999; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Project Dashboard</h1>
-        <p>A simple to-do list to keep you organized.</p>
-        <ul>
-            <li>Submit quarterly report</li>
-            <li>Update marketing materials</li>
-            <li>Onboard new vendor</li>
-            <li>Plan team offsite</li>
+        <h1 id="dashboard-title">Project Dashboard</h1>
+        <p id="dashboard-subtitle">A simple to-do list to keep you organized.</p>
+        <ul id="task-list">
+            <li class="loading">Loading tasks...</li>
         </ul>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const taskList = document.getElementById('task-list');
+            const title = document.getElementById('dashboard-title');
+            const subtitle = document.getElementById('dashboard-subtitle');
+
+            fetch('/weather')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    taskList.innerHTML = ''; // Clear loading state
+                    
+                    if (data.city && data.temp) {
+                        title.textContent = `Dashboard for ${data.city}`;
+                        subtitle.textContent = `Current Conditions: ${data.temp}°F, ${data.forecast}.`;
+                    }
+
+                    if (data.tasks && data.tasks.length > 0) {
+                        data.tasks.forEach(taskText => {
+                            const li = document.createElement('li');
+                            li.textContent = taskText;
+                            taskList.appendChild(li);
+                        });
+                    } else {
+                        taskList.innerHTML = '<li>No tasks found.</li>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch tasks:', error);
+                    taskList.innerHTML = '<li>Error loading tasks. Please try again later.</li>';
+                });
+        });
+    </script>
 </body>
 </html>
