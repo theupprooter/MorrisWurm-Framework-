@@ -1,7 +1,8 @@
 import { io, Socket } from 'socket.io-client';
-import { LogEntry, WormEvent } from '../types';
+import { LogEntry, WormEvent } from '../../types';
 
-const C2_URL = window.location.origin;
+// Connect to the same host that served the page, letting the Vite proxy handle it.
+const C2_URL = '';
 
 type LogCallback = (log: LogEntry) => void;
 type ConnectionCallback = (isConnected: boolean) => void;
@@ -15,6 +16,8 @@ class SimulationService {
         this.socket = io(C2_URL, {
             reconnectionAttempts: 5,
             reconnectionDelay: 3000,
+            // The path must match what the server expects
+            path: '/socket.io/',
         });
 
         this.socket.on('connect', () => {
@@ -59,17 +62,15 @@ class SimulationService {
         switch (type) {
             case 'connect':
                 message = `Worm connected [ID: ${instanceId}]`;
-                // FIX: Cast `data` to access the `wormCount` property, which is not present on the full union type.
                 wormCount = (data as { wormCount?: number }).wormCount;
                 break;
             case 'disconnect':
                 message = `Worm disconnected [ID: ${instanceId}]`;
-                // FIX: Cast `data` to access the `wormCount` property, which is not present on the full union type.
                 wormCount = (data as { wormCount?: number }).wormCount;
                 break;
             case 'report':
                 const reportData = data as { type: string, targetIp: string, details: string };
-                message = `Received failure report from [ID: ${instanceId}]: Type: ${reportData.type}, Target: ${reportData.targetIp}, Details: ${reportData.details}`;
+                message = `Received failure report from [ID: ${instanceId}]: Type: ${reportData.type}, Target: ${reportData.targetIp}`;
                 break;
             case 'mutation':
                  const mutationData = data as { mutation: string };

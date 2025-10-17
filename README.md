@@ -20,8 +20,7 @@ The simulation is built around a central loop that mimics a worm's lifecycle, or
 4.  **Command & Control (C2):** If an exploit fails, the worm reports the failure to a C2 server.
 5.  **AI-Driven Mutation:** The C2 server, upon receiving a report, sends the failure context and worm source code to a **Generative AI (Gemini)** via a detailed prompt. The AI analyzes the failure and generates a new, custom TypeScript payload to overcome the obstacle. This payload is broadcast to all connected worm instances.
 6.  **Live-Patching:** The worms execute the AI's code in a secure, sandboxed `vm` context to *dynamically patch their own modules in memory*. This allows the entire swarm to change its behavior instantly without restarting.
-7.  **Dynamic Disguise Facade:** While running, the worm starts an Express.js web server that serves a dynamic-looking "Project Dashboard" page to mask its true purpose.
-8.  **Time-To-Live (TTL):** The worm is designed with a `TTL_HOPS` limit to prevent infinite loops.
+7.  **Time-To-Live (TTL):** The worm is designed with a `TTL_HOPS` limit to prevent infinite loops.
 
 ---
 

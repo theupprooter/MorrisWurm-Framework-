@@ -1,30 +1,22 @@
 import { GoogleGenAI } from '@google/genai';
-import { logger } from '../utils';
+import { logger } from '../utils/logger.js';
 import fs from 'fs/promises';
 import path from 'path';
-import { ErrorLog } from '../../types/index';
+import { ErrorLog } from '../../types/index.js';
+import { fileURLToPath } from 'url';
 
-/**
- * Validates that the AI's response is a string that looks like an IIFE.
- * @param code The code string from the AI.
- * @returns True if the code is likely a valid IIFE.
- */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const isValidIIFE = (code: string | undefined): code is string => {
     if (!code) return false;
     const trimmed = code.trim();
-    // Check if it starts with ({ or (() => { and ends with })
     return (
         (trimmed.startsWith('({') || trimmed.startsWith('(() => {')) &&
         trimmed.endsWith('})')
     );
 };
 
-/**
- * Generates an adaptive code mutation by sending a detailed prompt and a failure
- * log to the Gemini API.
- * @param failureLog The specific error log reported by a worm instance.
- * @returns A string containing the AI-generated mutation code, or a fallback on error.
- */
 export const generateMutation = async (failureLog: ErrorLog): Promise<string | null> => {
     logger.info('[AI Engine]: Generating adaptive mutation based on failure log...');
     
@@ -45,7 +37,7 @@ export const generateMutation = async (failureLog: ErrorLog): Promise<string | n
         );
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-pro', // Corrected: Use a current, powerful model
+            model: 'gemini-2.5-pro',
             contents: finalPrompt,
         });
         
@@ -56,7 +48,6 @@ export const generateMutation = async (failureLog: ErrorLog): Promise<string | n
             return generatedCode;
         } else {
             logger.error(`[AI Engine]: AI response was not in the expected IIFE format. Response: ${generatedCode}`);
-            // Do not return a risky, wrapped response. Return null to indicate failure.
             throw new Error('AI returned malformed code.');
         }
 

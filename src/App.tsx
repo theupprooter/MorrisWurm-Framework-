@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { simulationService } from './services/simulationService';
-import { LogEntry } from './types';
+import { LogEntry } from '../types';
 import Terminal from './components/Terminal';
 import StatusBar from './components/StatusBar';
 
