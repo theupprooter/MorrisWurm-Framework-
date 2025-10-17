@@ -1,17 +1,19 @@
-// Fix: Change import to use the default export from express to avoid type conflicts with global DOM types.
-// FIX: Import the `Express`, `Request`, and `Response` types to disambiguate from global DOM types.
-import express, { Express, Request, Response } from 'express';
+// Fix: Changed import to only use the default export of express.
+// This allows using qualified types like `express.Request` to avoid conflicts with global DOM types.
+import express from 'express';
 import path from 'path';
 import { logger } from './logger';
 
 export const startDisguise = (): void => {
-    // FIX: Explicitly type `app` to ensure Express's types are used for its methods, resolving overload errors.
-    const app: Express = express();
+    // Fix: Explicitly type `app` with the qualified `express.Express` type.
+    // This resolves overload errors on `app.use` by removing type ambiguity.
+    const app: express.Express = express();
     const port = 3000;
 
     // Endpoint to serve dynamic-looking data for the facade
-    // FIX: Explicitly type handler parameters to resolve ambiguity with global DOM types, which was causing overload errors on `app.use`.
-    app.get('/weather', (req: Request, res: Response) => {
+    // Fix: Explicitly type handler parameters with qualified `express.Request` and `express.Response` types.
+    // This resolves the error where properties like `.json()` were not found due to type conflicts.
+    app.get('/weather', (req: express.Request, res: express.Response) => {
         res.json({
             city: 'Metro City',
             temp: 72,
@@ -26,7 +28,6 @@ export const startDisguise = (): void => {
     });
 
     const publicPath = path.join(__dirname, '../../public');
-    // Fix: Explicitly provide path to resolve overload ambiguity.
     app.use('/', express.static(publicPath));
 
     app.listen(port, () => {

@@ -8,7 +8,7 @@ const NMAP_RANGE = '192.168.1.0/24';
 // Ports of interest for potential exploits
 const PORTS_TO_SCAN = '22,80,445';
 
-const scanLocalNet = async (): Promise<Target[]> => {
+export const scanLocalNet = async (): Promise<Target[]> => {
     logger.info(`Module [Recon]: Starting nmap scan for ${NMAP_RANGE} on ports ${PORTS_TO_SCAN}...`);
     logger.info(`Module [Recon]: (This may take a few minutes and requires nmap to be installed on your system)`);
 
@@ -43,8 +43,4 @@ const scanLocalNet = async (): Promise<Target[]> => {
 
         nmapScan.startScan();
     });
-};
-
-export const recon = {
-    scanLocalNet,
 };

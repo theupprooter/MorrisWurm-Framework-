@@ -18,7 +18,7 @@ The simulation is built around a central loop that mimics a worm's lifecycle, or
 2.  **Exploitation:** Upon finding a target, it attempts a *mock* breach. The success rate of this breach is configurable, simulating the varying effectiveness of different exploits.
 3.  **Replication:** If the exploit is "successful," the worm attempts to replicate itself to the target machine. It uses the `ssh2` library to connect with weak, pre-configured credentials, copies its own source code (`worm.ts`) via SFTP, and simulates remote execution.
 4.  **Command & Control (C2):** If an exploit fails, the worm reports the failure to a mock C2 server. This communication is resilient; if the C2 is down, reports are queued in memory to be sent later. The C2 communicates back using a real-time, broadcast-based system.
-5.  **Dynamic Mutation:** The C2 server, upon receiving a report, can broadcast a new payload of TypeScript code to all connected worm instances simultaneously via Socket.IO. The worm executes this code in a secure, sandboxed `vm` context to *dynamically patch its own modules in memory*. This allows the entire swarm to change its behavior (e.g., its exploit logic) instantly without restarting.
+5.  **Dynamic Mutation:** The C2 server, upon receiving a report, can broadcast a new payload of TypeScript code to all connected worm instances simultaneously via Socket.IO. The worm executes this code in a secure, sandboxed `vm` context to *dynamically patch its own modules (like `recon`, `exploit`, and `replication`) in memory*. This allows the entire swarm to change its behavior instantly without restarting.
 6.  **Dynamic Disguise Facade:** While running, the worm starts an Express.js web server that serves a dynamic-looking "Project Dashboard" page. The page fetches data from a mock `/weather` API endpoint on the same server, making it appear as a legitimate web app to mask the process's true purpose.
 7.  **Time-To-Live (TTL):** The worm is designed with a `TTL_HOPS` limit. After a set number of successful replications (hops), it terminates itself to prevent an infinite loop in the simulation.
 
@@ -51,7 +51,9 @@ morriswurm-ts/
 │   │   ├── connector.ts# Real-time Socket.IO client for receiving C2 broadcasts
 │   │   ├── crypto.ts   # AES-256-CBC + HMAC-SHA256 implementation
 │   │   ├── exploit.ts  # Mock breach logic (can be patched at runtime)
-│   │   └── recon.ts    # Network scanning for potential targets
+│   │   ├── mutations.ts# Collection of C2-deployable code payloads
+│   │   ├── recon.ts    # Network scanning for potential targets
+│   │   └── replication.ts# Self-replication logic via SSH/SFTP
 │   ├── utils/
 │   │   ├── disguise.ts # The Express.js facade server with mock API
 │   │   ├── index.ts    # Barrel file for easy exports
@@ -132,8 +134,8 @@ You will see logs from both the C2 server and the worm instance, distinguished b
 [0] 2023-10-27 12:01:06 info: C2 Server: Broadcasting mutation to all clients.
 [1] 2023-10-27 12:01:06 info: Module [Connector]: Received mutation broadcast from C2. Decrypting and applying...
 [1] 2023-10-27 12:01:06 info: Module [Mutation]: Applying new code received from C2...
-[1] 2023-10-27 12:01:06 info: Module [Mutation]: Successfully applied mutation. Exploit behavior has been altered.
+[1] 2023-10-27 12:01:06 info: Module [Mutation]: Successfully applied live patch to module: 'exploit'.
 ...
-[1] 2023-10-27 12:01:12 warn: [MUTATION ACTIVE] C2 deployed a new exploit variant. This test variant always fails.
+[1] 2023-10-27 12:01:12 info: [MUTATION ACTIVE] Using high-success-rate exploit (75%) on 192.168.1.11.
 ...
 ```
