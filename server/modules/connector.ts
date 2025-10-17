@@ -1,6 +1,7 @@
+
 import { io } from 'socket.io-client';
-import { decrypt } from './crypto.js';
-import { logger } from '../utils/logger.js';
+import { decrypt } from './crypto.ts';
+import { logger } from '../utils/logger.ts';
 
 const C2_URL = `http://localhost:${process.env.C2_PORT || 4000}`;
 

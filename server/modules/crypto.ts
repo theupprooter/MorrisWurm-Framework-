@@ -1,5 +1,6 @@
+
 import crypto from 'crypto';
-import { logger } from '../utils/logger.js';
+import { logger } from '../utils/logger.ts';
 
 const ALGORITHM = 'aes-256-cbc';
 const IV_LENGTH = 16;

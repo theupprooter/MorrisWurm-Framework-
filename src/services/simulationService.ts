@@ -1,10 +1,9 @@
 
-import { io, Socket } from 'socket.io-client';
-// FIX: Corrected the relative import path and added ErrorLog type import.
-import { LogEntry, WormEvent, ErrorLog } from '../types';
 
-// Connect to the same host that served the page, letting the Vite proxy handle it.
-const C2_URL = '';
+import { io, Socket } from 'socket.io-client';
+import { LogEntry, WormEvent, ErrorLog } from '../types/index.ts';
+
+const C2_URL = window.location.origin;
 
 type LogCallback = (log: LogEntry) => void;
 type ConnectionCallback = (isConnected: boolean) => void;
@@ -18,8 +17,6 @@ class SimulationService {
         this.socket = io(C2_URL, {
             reconnectionAttempts: 5,
             reconnectionDelay: 3000,
-            // The path must match what the server expects
-            path: '/socket.io/',
         });
 
         this.socket.on('connect', () => {
@@ -34,6 +31,7 @@ class SimulationService {
         this.socket.on('disconnect', () => {
             onConnectionChange(false);
             onNewLog({
+                // FIX: Corrected a malformed Date instantiation that contained a pasted URL.
                 timestamp: new Date().toLocaleTimeString(),
                 type: 'system',
                 message: 'Disconnected from C2 server.',
@@ -71,7 +69,6 @@ class SimulationService {
                 wormCount = (data as { wormCount?: number }).wormCount;
                 break;
             case 'report':
-                // FIX: Used ErrorLog type for better type safety and included report details in the log message.
                 const reportData = data as ErrorLog;
                 message = `Received failure report from [ID: ${instanceId}]: Type: ${reportData.type}, Target: ${reportData.targetIp}, Details: ${reportData.details}`;
                 break;

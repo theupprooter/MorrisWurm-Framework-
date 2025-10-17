@@ -1,5 +1,6 @@
-import { Target } from '../../types/index.js';
-import { logger } from '../utils/logger.js';
+
+import { Target } from '../../types/index.ts';
+import { logger } from '../utils/logger.ts';
 import nmap from 'node-nmap';
 
 const NMAP_RANGE = '192.168.1.0/24'; 

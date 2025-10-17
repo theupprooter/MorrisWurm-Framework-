@@ -1,8 +1,9 @@
+
 import { GoogleGenAI } from '@google/genai';
-import { logger } from '../utils/logger.js';
+import { logger } from '../utils/logger.ts';
 import fs from 'fs/promises';
 import path from 'path';
-import { ErrorLog } from '../../types/index.js';
+import { ErrorLog } from '../../types/index.ts';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

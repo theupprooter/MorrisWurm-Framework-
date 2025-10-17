@@ -1,6 +1,7 @@
-import { ErrorLog } from '../../types/index.js';
-import { logger } from '../utils/logger.js';
-import { encrypt } from './crypto.js';
+
+import { ErrorLog } from '../../types/index.ts';
+import { logger } from '../utils/logger.ts';
+import { encrypt } from './crypto.ts';
 import axios from 'axios';
 
 const C2_URL = `http://localhost:${process.env.C2_PORT || 4000}`;

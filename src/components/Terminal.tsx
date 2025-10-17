@@ -1,7 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-// FIX: Corrected the relative import path for types.
-import { LogEntry } from '../types';
+import { LogEntry } from '../types/index.ts';
 import { ConnectIcon, ReportIcon, MutationIcon, SystemIcon, ErrorIcon, DisconnectIcon } from './icons';
 
 interface TerminalProps {
